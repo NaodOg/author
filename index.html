@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Author Cards</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      background-color: #284d72;
+    }
+
+    .card {
+      width: 45%;
+      margin: 10px;
+      background-color: #7395b6;
+    }
+
+    .details {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 45%;
+      padding: 20px;
+      background-color: #7395b6;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-6" id="authorCards"></div>
+  </div>
+</div>
+
+<div class="details" id="authorDetails"></div>
+
+<script>
+  const url = 'https://hapi-books.p.rapidapi.com/top_authors';
+  const options = {
+    method: 'GET',
+    headers: {
+      'X-RapidAPI-Key': '0801c5d86cmshf758e1f9899f090p1fc753jsn1fc2bb41b999',
+      'X-RapidAPI-Host': 'hapi-books.p.rapidapi.com'
+    }
+  };
+
+  const createCard = (author) => {
+    let wrapper = document.createElement("div");
+    wrapper.className = "card";
+
+    let cardBody = document.createElement("div");
+    cardBody.className = "card-body";
+
+    let title = document.createElement("h5");
+    title.className = "card-title";
+    title.textContent = author.name;
+
+    let image = document.createElement("img");
+    image.className = "card-img-top";
+    image.src = author.image;
+    image.alt = `${author.name} image`;
+
+    let moreButton = document.createElement("button");
+    moreButton.className = "btn btn-primary";
+    moreButton.textContent = "More";
+    moreButton.addEventListener("click", () => {
+      showDetails(author);
+    });
+
+    cardBody.appendChild(title);
+    cardBody.appendChild(image);
+    cardBody.appendChild(moreButton);
+
+    wrapper.appendChild(cardBody);
+
+    document.getElementById("authorCards").appendChild(wrapper);
+  };
+
+  const showDetails = (author) => {
+    let detailsDiv = document.getElementById("authorDetails");
+    detailsDiv.innerHTML = "";
+
+    let detailsBox = document.createElement("div");
+    detailsBox.className = "details-box";
+
+    let closeButton = document.createElement("button");
+    closeButton.className = "btn btn-danger";
+    closeButton.textContent = "Close";
+    closeButton.addEventListener("click", () => {
+      detailsBox.style.display = "none";
+    });
+
+    let name = document.createElement("h2");
+    name.textContent = author.name;
+
+    let image = document.createElement("img");
+    image.src = author.image;
+    image.alt = `${author.name} image`;
+
+    let bookTitle = document.createElement("p");
+    bookTitle.innerHTML = `<strong>Popular Book:</strong> ${author.popular_book_title}`;
+
+    let bookLink = document.createElement("a");
+    bookLink.href = author.popular_book_url;
+    bookLink.textContent = "Read more";
+    bookLink.target = "_blank";
+
+    let publishedBooks = document.createElement("p");
+    publishedBooks.innerHTML = `<strong>Number of Published Books:</strong> ${author.number_published_books}`;
+
+    let goodreadsLink = document.createElement("a");
+    goodreadsLink.href = author.url;
+    goodreadsLink.textContent = "Goodreads Profile";
+    goodreadsLink.target = "_blank";
+
+    detailsBox.appendChild(closeButton);
+    detailsBox.appendChild(name);
+    detailsBox.appendChild(image);
+    detailsBox.appendChild(bookTitle);
+    detailsBox.appendChild(bookLink);
+    detailsBox.appendChild(publishedBooks);
+    detailsBox.appendChild(goodreadsLink);
+
+    detailsDiv.appendChild(detailsBox);
+    detailsBox.style.display = "block";
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(url, options);
+      const authors = await response.json();
+      authors.forEach(author => createCard(author));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchData();
+</script>
+
+</body>
+</html>
